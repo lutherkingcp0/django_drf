@@ -146,7 +146,6 @@ Pygments==2.19.1
 PyJWT==2.10.1
 PyMatting==1.1.14
 pyparsing==3.2.5
-pypiwin32==223
 pyreadline3==3.5.4
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.1
