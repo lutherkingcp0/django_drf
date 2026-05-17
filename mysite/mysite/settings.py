@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-import os
+import os, dj_database_url
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,18 +26,27 @@ SECRET_KEY = "django-insecure-pk@!+krmr+e1+b9-7uvyger9jde^!i93%36j(+-jhdwr%xy4o=
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-CSRF_TRUSTED_ORIGINS = ["http://*.on-acorn.io", "https://*.on-acorn.io"]
 
 # Base de données (Railway fournit PostgreSQL)
 import dj_database_url # pyright: ignore[reportMissingImports]
 
-DATABASES = {
-    "default": dj_database_url.config(
-        default=os.getenv("DATABASE_URL"),
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-}
+import os
+import dj_database_url
+
+if os.environ.get('DATABASE_URL'):
+    # En production (Railway)
+    DATABASES = {
+        'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+    }
+else:
+    # En local → SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
 
 # Application definition
 
@@ -50,7 +59,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "api",
     "rest_framework",
+    'drf_yasg',
 ]
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -87,16 +98,7 @@ WSGI_APPLICATION = "mysite.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": os.getenv("MARIADB_DATABASE"),
-        "USER": os.getenv("MARIADB_USER"),
-        "PASSWORD": os.getenv("MARIADB_ROOT_PASSWORD"),
-        "HOST": os.getenv("MARIADB_HOST"),
-        "PORT": os.getenv("MARIADB_PORT", 3306),
-    }
-}
+
 
 
 # Password validation
